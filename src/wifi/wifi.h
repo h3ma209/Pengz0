@@ -12,9 +12,12 @@ extern Adafruit_SSD1306 display;
 extern bool inWiFiMenu;
 extern uint8_t wifiIndex;
 extern uint8_t selectedIndex;
-extern uint8_t settingIndex; // Add settingIndex as well, if needed in wifi functions
-extern bool inSettings; // Add inSettings as well, if needed in wifi functions
-extern uint8_t selectedIndex;
+extern uint8_t settingIndex;
+extern bool inSettings;
+extern uint8_t selectedIndex; // Duplicated declaration - remove this one!
+extern bool inFakeAPMenu;      // ADD: Flag to track if we are in the Fake AP Menu
+extern uint8_t fakeAPIndex;     // ADD: Tracks the currently selected Fake AP menu item
+
 
 // WiFi and AP related variables
 extern DNSServer dnsServer;
@@ -22,12 +25,18 @@ extern ESP8266WebServer webServer;
 extern const char* apSSID;
 extern const char* apPassword;
 extern const char* captivePortalPage;
+extern bool fakeAPEnabled;     // ADD: Flag to track if Fake AP is enabled
+
 
 // Function Prototypes
 void showWiFiMenu();
 void startFakeAP();
+void stopFakeAP();          // ADD: Function to stop Fake AP
 void handleClientRequest(); // If needed to be called from main loop
 void handleWiFiMenuNavigation(); // Function to handle navigation within wifi menu
+void showFakeAPMenu();         // ADD: Function to display the Fake AP Menu
+void handleFakeAPMenuNavigation(); // ADD: Function to handle navigation in Fake AP Menu
+
 
 #ifdef __cplusplus
 extern "C" {

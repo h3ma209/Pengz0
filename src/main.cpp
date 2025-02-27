@@ -9,11 +9,15 @@
 #define BUTTON_NEXT  14  // Scroll button (e.g., connected to GPIO14) D5
 #define BUTTON_SELECT 12 // Select button (e.g., connected to GPIO12) D6
 
-uint8_t selectedIndex = 0;    // Tracks the currently selected menu item
-uint8_t settingIndex = 0;     // Tracks the currently selected setting option
-uint8_t wifiIndex = 0;        // Tracks the currently selected WiFi option
-bool inSettings = false;      // Flag to track if we are in the settings menu
+uint8_t selectedIndex = 0;
+uint8_t settingIndex = 0;
+uint8_t wifiIndex = 0;
+bool inSettings = false;
 bool inWiFiMenu = false;
+bool inFakeAPMenu = false;     // ADD: Flag for Fake AP Menu
+uint8_t fakeAPIndex = 0;        // ADD: Index for Fake AP Menu
+bool fakeAPEnabled = false;    // ADD: Flag to track Fake AP status - initially off
+
 
 // Captive Portal variables - Definitions (memory allocation)
 DNSServer dnsServer;
@@ -87,17 +91,23 @@ void handleMenuNavigation() {
   uint8_t currentStateSelect = digitalRead(BUTTON_SELECT);
 
   if (currentStateNext == LOW && lastStateNext == HIGH) {
-    Serial.println("Next button pressed (LOW)"); // ADDED
+    Serial.println("Next button pressed (LOW)");
     if (inSettings) {
-      Serial.println("In Settings Menu"); // ADDED
+      Serial.println("In Settings Menu");
       settingIndex = (settingIndex + 1) % 4;
       showSettings();
     } else if (inWiFiMenu) {
-      Serial.println("In WiFi Menu - Scrolling"); // ADDED
-      wifiIndex = (wifiIndex + 1) % 3;
-      showWiFiMenu();
+      Serial.println("In WiFi Menu - Scrolling");
+      if (inFakeAPMenu) {            // ADD: Check if in Fake AP Menu
+        Serial.println("In Fake AP Menu - Scrolling");
+        fakeAPIndex = (fakeAPIndex + 1) % 3;
+        showFakeAPMenu();
+      } else {                        // Otherwise scroll WiFi Menu Options
+        wifiIndex = (wifiIndex + 1) % 3; // Assuming 3 WiFi options now, adjust as needed in wifi.cpp
+        showWiFiMenu();
+      }
     } else {
-      Serial.println("In Main Menu - Scrolling Main Options"); // ADDED
+      Serial.println("In Main Menu - Scrolling Main Options");
       selectedIndex = (selectedIndex + 1) % 5;
       showMenu(selectedIndex);
     }
@@ -105,30 +115,37 @@ void handleMenuNavigation() {
   }
 
   if (currentStateSelect == LOW && lastStateSelect == HIGH) {
-    Serial.println("Select button pressed (LOW) in Main Menu Handler"); // ADDED
-    Serial.print("Current selectedIndex: "); Serial.println(selectedIndex); // ADDED
-    Serial.print("Current inSettings: "); Serial.println(inSettings); // ADDED
-    Serial.print("Current inWiFiMenu: "); Serial.println(inWiFiMenu); // ADDED
+    Serial.println("Select button pressed (LOW) in Main Menu Handler");
+    Serial.print("Current selectedIndex: "); Serial.println(selectedIndex);
+    Serial.print("Current inSettings: "); Serial.println(inSettings);
+    Serial.print("Current inWiFiMenu: "); Serial.println(inWiFiMenu);
+    Serial.print("Current inFakeAPMenu: "); Serial.println(inFakeAPMenu); // ADD: Debug print
 
     if (inSettings) {
       if (settingIndex == 3) {
         inSettings = false;
         showMenu(selectedIndex);
-        Serial.println("Going back to Main Menu from Settings"); // ADDED
+        Serial.println("Going back to Main Menu from Settings");
       } else {
         Serial.print("Settings Option: ");
         Serial.println(settingIndex);
       }
     } else if (inWiFiMenu) {
-      Serial.println("In WiFi Menu - Handling WiFi Select"); // ADDED
-      handleWiFiMenuNavigation();
-      Serial.println("Returned from handleWiFiMenuNavigation()"); // ADDED
+      if (inFakeAPMenu) {        // ADD: Check if in Fake AP Menu
+        Serial.println("In Fake AP Menu - Handling Selection");
+        handleFakeAPMenuNavigation(); // Handle Fake AP Menu selections
+        Serial.println("Returned from handleFakeAPMenuNavigation()");
+      } else {                      // Otherwise handle WiFi Menu selections
+        Serial.println("In WiFi Menu - Handling WiFi Select");
+        handleWiFiMenuNavigation();    // Handle WiFi Menu selections
+        Serial.println("Returned from handleWiFiMenuNavigation()");
+      }
     } else {
       switch (selectedIndex) {
         case 0:
           inWiFiMenu = true;
           showWiFiMenu();
-          Serial.println("Entering WiFi Menu from Main Menu"); // ADDED
+          Serial.println("Entering WiFi Menu from Main Menu");
           break;
         case 1: Serial.println("Radio"); break;
         case 2: Serial.println("RFID"); break;
@@ -136,7 +153,7 @@ void handleMenuNavigation() {
         case 4:
           inSettings = true;
           showSettings();
-          Serial.println("Entering Settings Menu from Main Menu"); // ADDED
+          Serial.println("Entering Settings Menu from Main Menu");
           break;
       }
     }
