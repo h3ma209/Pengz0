@@ -4,9 +4,10 @@
 #include <ESP8266WiFi.h> // Already included in wifi.h, but good practice to include here if directly used
 #include <DNSServer.h>   // Already included in wifi.h, but good practice to include here if directly used
 #include <ESP8266WebServer.h> // Already included in wifi.h, but good practice to include here if directly used
+#include "../bitmaps/kawaski.h" // Include for bitmap usage
 
-// Forward declaration for Adafruit_SSD1306 only, as headers for DNSServer and ESP8266WebServer are included
-class Adafruit_SSD1306;
+
+class Adafruit_SSD1306;// Forward declaration for Adafruit_SSD1306 only, as headers for DNSServer and ESP8266WebServer are included
 
 
 // External variables (defined in main sketch) that Fake AP code needs to access
@@ -22,6 +23,7 @@ extern Adafruit_SSD1306 display; // For potential display updates from FakeAP co
 // Function Prototypes for Fake AP functionality
 void startFakeAP();
 void stopFakeAP();
+void displayKawaskiBitmap();
 
 
 #endif // FAKE_AP_H

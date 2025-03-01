@@ -3,6 +3,9 @@
 #include <ESP8266WiFi.h> // For WiFi functions
 #include <DNSServer.h>   // For DNSServer
 #include <ESP8266WebServer.h> // For WebServer
+#include <Adafruit_SSD1306.h> // Include for display usage
+#include <Adafruit_GFX.h> // Include for display usage
+#include "../bitmaps/kawaski.h" // Include for bitmap usage
 
 
 // External variables - Declarations (these are DEFINED in main.cpp)
@@ -15,7 +18,18 @@ extern bool fakeAPEnabled;
 extern Adafruit_SSD1306 display;
 
 
-// Function Implementations for Fake AP
+
+void displayKawaskiBitmap(){
+  Serial.println("Displaying Kawasaki Bitmap from fake_ap.cpp");
+  display.clearDisplay();
+  display.drawBitmap(0,0,kawaskiBitmap, 128, 64, SSD1306_WHITE);
+  display.display();
+  Serial.println("Kawasaki Bitmap displayed from fake_ap.cpp");
+  delay(1000);
+  display.clearDisplay();
+  display.display();
+  Serial.println("Display cleared from fake_ap.cpp");
+}
 
 // Start Fake Access Point
 void startFakeAP() {
@@ -23,6 +37,7 @@ void startFakeAP() {
     Serial.println("Fake AP already enabled, ignoring start request from fake_ap.cpp.");
     return; // Do not restart if already enabled
   }
+  displayKawaskiBitmap();
   Serial.println("Starting Fake AP from fake_ap.cpp...");
   WiFi.mode(WIFI_AP);
   WiFi.softAP(apSSID, apPassword);  // Start AP with no password

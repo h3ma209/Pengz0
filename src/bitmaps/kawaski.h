@@ -1,4 +1,4 @@
-#ifdef KAWASKI_H
+#ifndef KAWASKI_H  // Corrected to #ifndef
 #define KAWASKI_H
 
 #include <stdint.h>
