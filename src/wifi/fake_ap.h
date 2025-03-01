@@ -5,7 +5,7 @@
 #include <DNSServer.h>   // Already included in wifi.h, but good practice to include here if directly used
 #include <ESP8266WebServer.h> // Already included in wifi.h, but good practice to include here if directly used
 #include "../bitmaps/kawaski.h" // Include for bitmap usage
-
+#include "../bitmaps/beegyoshi.h" // Include for bitmap usage
 
 class Adafruit_SSD1306;// Forward declaration for Adafruit_SSD1306 only, as headers for DNSServer and ESP8266WebServer are included
 
@@ -24,6 +24,7 @@ extern Adafruit_SSD1306 display; // For potential display updates from FakeAP co
 void startFakeAP();
 void stopFakeAP();
 void displayKawaskiBitmap();
+void displayBeegYoshiBitmap();
 
 
 #endif // FAKE_AP_H

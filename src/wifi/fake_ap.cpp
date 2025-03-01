@@ -5,7 +5,7 @@
 #include <ESP8266WebServer.h> // For WebServer
 #include <Adafruit_SSD1306.h> // Include for display usage
 #include <Adafruit_GFX.h> // Include for display usage
-#include "../bitmaps/kawaski.h" // Include for bitmap usage
+
 
 
 // External variables - Declarations (these are DEFINED in main.cpp)
@@ -17,14 +17,36 @@ extern const char* captivePortalPage;
 extern bool fakeAPEnabled;
 extern Adafruit_SSD1306 display;
 
-
+void displayBeegYoshiBitmap(){
+  Serial.println("Displaying BeegYoshi Bitmap from fake_ap.cpp");
+  display.clearDisplay();
+  display.drawBitmap(0,0,beegyoshiBitmap, 128, 64, SSD1306_WHITE);
+  display.display();
+  Serial.println("BeegYoshi Bitmap displayed from fake_ap.cpp");
+  delay(1000);
+  display.clearDisplay();
+  display.display();
+  Serial.println("Display cleared from fake_ap.cpp");
+}
 
 void displayKawaskiBitmap(){
   Serial.println("Displaying Kawasaki Bitmap from fake_ap.cpp");
   display.clearDisplay();
   display.drawBitmap(0,0,kawaskiBitmap, 128, 64, SSD1306_WHITE);
+
+  display.setTextSize(1);
+  display.setTextColor(SSD1306_BLACK);
+
+  // Calculate vertical center position directly in setCursor
+  display.setCursor(64, 32 - 8); // Right-center, vertically centered calculation inline
+
+  // Write the "Kawaski Analysis" text in two lines
+  display.println("Kawaski");
+  display.setCursor(64, display.getCursorY()); // Move cursor to the next line, same horizontal position
+  display.println("Analysis");
+
   display.display();
-  Serial.println("Kawasaki Bitmap displayed from fake_ap.cpp");
+  Serial.println("Kawasaki Bitmap displayed with right-center text from fake_ap.cpp");
   delay(1000);
   display.clearDisplay();
   display.display();
@@ -58,6 +80,7 @@ void stopFakeAP() {
     Serial.println("Fake AP already disabled, ignoring stop request from fake_ap.cpp.");
     return; // Do not stop if already disabled
   }
+  displayKawaskiBitmap();
   Serial.println("Stopping Fake AP from fake_ap.cpp...");
   webServer.stop();
   dnsServer.stop();
