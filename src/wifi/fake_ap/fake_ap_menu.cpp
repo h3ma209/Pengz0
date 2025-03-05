@@ -49,42 +49,55 @@ void showFakeAPMenu(Adafruit_SSD1306 &display) {
     display.display();
 }
 
-
 void handleFakeAPMenuNavigation(Adafruit_SSD1306 &display) {
-    uint8_t lastStateSelectFakeAP = HIGH;
-    uint8_t currentStateSelectFakeAP = digitalRead(BUTTON_SELECT);
+    static uint8_t lastStateSelectFakeAP = HIGH;
+    static uint8_t currentStateSelectFakeAP = digitalRead(BUTTON_SELECT);
+    static uint8_t lastStateNextFakeAP = HIGH;      // Track state of NEXT button
+    static uint8_t currentStateNextFakeAP = digitalRead(BUTTON_NEXT); // Read NEXT button state
 
+    // --- Handle SELECT button ---
     if (currentStateSelectFakeAP == LOW && lastStateSelectFakeAP == HIGH) {
-        Serial.println("FakeAP Menu Select button pressed (LOW) from fake_ap_menu.cpp"); // Added print here
+        Serial.println("FakeAP Menu Select button pressed (LOW) from fake_ap_menu.cpp");
         Serial.print("FakeAP Selected Index: ");
-        Serial.println(fakeAPIndex); // Print fakeAPIndex value
+        Serial.println(fakeAPIndex);
         switch (fakeAPIndex) {
             case 0: // "Turn On" selected
                 Serial.println("Turn On Fake AP selected from fake_ap_menu.cpp");
-                startFakeAP(); // Call startFakeAP function - now in fake_ap.cpp
-                showFakeAPMenu(display); // Refresh display to show "Status: ON" immediately
+                startFakeAP();
+                showFakeAPMenu(display);
                 break;
             case 1: // "Turn Off" selected
                 Serial.println("Turn Off Fake AP selected from fake_ap_menu.cpp");
-                stopFakeAP();  // Call stopFakeAP function - now in fake_ap.cpp
-                showFakeAPMenu(display); // Refresh display to show "Status: OFF" immediately
+                stopFakeAP();
+                showFakeAPMenu(display);
                 break;
             case 2: // "Back" option
                 Serial.println("Back option selected in FakeAP Menu from fake_ap_menu.cpp");
-                inFakeAPMenu = false;      // Exit Fake AP Menu
-                inWiFiMenu = false; //Actually Main Menu now but used to control menu level to false to go back to main menu
-                showMainMenu(selectedIndex, display);            // Go back to main menu
-                fakeAPIndex = 0;           // Reset fakeAPIndex when going back
-                Serial.print("inFakeAPMenu set to: ");
-                Serial.println(inFakeAPMenu); // Print inFakeAPMenu value after setting
-                Serial.print("fakeAPIndex reset to: ");
-                Serial.println(fakeAPIndex); // Print fakeAPIndex value after reset
+                inFakeAPMenu = false;
+                inWiFiMenu = false; //Actually Main Menu now
+                showMainMenu(selectedIndex, display);
+                fakeAPIndex = 0;
                 break;
             default:
-                Serial.println("Unexpected fakeAPIndex in handleFakeAPMenuNavigation from fake_ap_menu.cpp"); // Added default case print
+                Serial.println("Unexpected fakeAPIndex in handleFakeAPMenuNavigation from fake_ap_menu.cpp");
                 break;
         }
-        delay(200); // Debounce delay
+        delay(200); // Debounce delay (consider making this non-blocking if needed)
     }
-    lastStateSelectFakeAP = currentStateSelectFakeAP;
+    lastStateSelectFakeAP = currentStateSelectFakeAP; // Update SELECT button last state
+
+
+    // --- Handle NEXT button ---  <--- ADD THIS SECTION
+    if (currentStateNextFakeAP == LOW && lastStateNextFakeAP == HIGH) {
+        Serial.println("FakeAP Menu NEXT button pressed (LOW)");
+        if (fakeAPIndex < 2) { // Assuming 3 options (0, 1, 2 index)
+            fakeAPIndex++;
+        } else {
+            fakeAPIndex = 0; // Wrap around to the first option
+        }
+        Serial.print("fakeAPIndex after NEXT: ");
+        Serial.println(fakeAPIndex);
+        showFakeAPMenu(display); // Update display to show new selection
+    }
+    lastStateNextFakeAP = currentStateNextFakeAP;      // Update NEXT button last state
 }

@@ -44,11 +44,11 @@ void showMainMenu(uint8_t selectedIndex, Adafruit_SSD1306 &display) {
 
 // Function to handle menu navigation with buttons in Main Menu
 void handleMainMenuNavigation(uint8_t &selectedIndex, bool &inSettings, bool &inWiFiMenu, Adafruit_SSD1306 &display) {
-    uint8_t lastStateNext = HIGH;
-    uint8_t lastStateSelect = HIGH;
+    static uint8_t lastStateNext = HIGH;
+    static uint8_t lastStateSelect = HIGH;
 
-    uint8_t currentStateNext = digitalRead(BUTTON_NEXT);
-    uint8_t currentStateSelect = digitalRead(BUTTON_SELECT);
+    static uint8_t currentStateNext = digitalRead(BUTTON_NEXT);
+    static uint8_t currentStateSelect = digitalRead(BUTTON_SELECT);
 
     if (currentStateNext == LOW && lastStateNext == HIGH) {
         Serial.println("Main Menu: Next button pressed (LOW)");
