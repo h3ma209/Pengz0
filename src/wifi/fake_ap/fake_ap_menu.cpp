@@ -51,8 +51,8 @@ void showFakeAPMenu(Adafruit_SSD1306 &display) {
 
 
 void handleFakeAPMenuNavigation(Adafruit_SSD1306 &display) {
-    static uint8_t lastStateSelectFakeAP = HIGH;
-    static uint8_t currentStateSelectFakeAP = digitalRead(BUTTON_SELECT);
+    uint8_t lastStateSelectFakeAP = HIGH;
+    uint8_t currentStateSelectFakeAP = digitalRead(BUTTON_SELECT);
 
     if (currentStateSelectFakeAP == LOW && lastStateSelectFakeAP == HIGH) {
         Serial.println("FakeAP Menu Select button pressed (LOW) from fake_ap_menu.cpp"); // Added print here

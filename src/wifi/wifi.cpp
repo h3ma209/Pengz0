@@ -21,12 +21,12 @@ extern bool inFakeAPMenu;
 extern uint8_t fakeAPIndex;
 extern bool fakeAPEnabled;
 
-bool inCloneAPMenu = false;
-uint8_t cloneAPIndex = 0;
-std::vector<WiFiNetwork> scannedNetworks;
-
-bool inEvilTwinMenu = false;
-uint8_t evilTwinIndex = 0;
+// REMOVE THESE DEFINITIONS FROM wifi.cpp - They are DEFINED in main.cpp
+// bool inCloneAPMenu = false;
+// uint8_t cloneAPIndex = 0;
+// std::vector<WiFiNetwork> scannedNetworks;
+// bool inEvilTwinMenu = false;
+// uint8_t evilTwinIndex = 0;
 
 
 // Placeholder for handling client requests if needed - currently handled in main loop

@@ -37,10 +37,10 @@ void showSettings(Adafruit_SSD1306 &display) {
 
 // Function to handle navigation within the Settings menu
 void handleSettingsNavigation(Adafruit_SSD1306 &display) {
-    static uint8_t lastStateSelectSettings = HIGH;
-    static uint8_t currentStateSelectSettings = digitalRead(BUTTON_SELECT);
-    static uint8_t lastStateNextSettings = HIGH;
-    static uint8_t currentStateNextSettings = digitalRead(BUTTON_NEXT);
+    uint8_t lastStateSelectSettings = HIGH;
+    uint8_t currentStateSelectSettings = digitalRead(BUTTON_SELECT);
+    uint8_t lastStateNextSettings = HIGH;
+    uint8_t currentStateNextSettings = digitalRead(BUTTON_NEXT);
 
     if (currentStateNextSettings == LOW && lastStateNextSettings == HIGH) {
         Serial.println("Settings Menu: Next button pressed (LOW)");

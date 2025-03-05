@@ -6,12 +6,19 @@
 #include <Arduino.h>      // For digitalRead, Serial, etc.
 #include <Adafruit_SSD1306.h> // For display functions
 #include "../wifi/fake_ap/fake_ap_menu.h"
+#include "wifi_menu.h" // Include WiFi Menu
 
 // *************************************************************
 // NOTE: Global variables related to menu state are still in main.cpp.
 // We are passing them as references to these menu functions.
 // *************************************************************
-
+extern bool inSettings;
+extern uint8_t settingIndex;
+extern bool inMainMenu; // Make sure MainMenu visibility is controlled
+extern bool inWiFiMenu;   // <---- ADD THIS:  Extern declaration for inWiFiMenu
+extern uint8_t wifiIndex;    // <---- ADD THIS: Extern declaration for wifiIndex
+extern bool inFakeAPMenu;
+extern uint8_t fakeAPIndex;
 
 // Function to display the main menu
 void showMainMenu(uint8_t selectedIndex, Adafruit_SSD1306 &display) {
@@ -37,8 +44,8 @@ void showMainMenu(uint8_t selectedIndex, Adafruit_SSD1306 &display) {
 
 // Function to handle menu navigation with buttons in Main Menu
 void handleMainMenuNavigation(uint8_t &selectedIndex, bool &inSettings, bool &inWiFiMenu, Adafruit_SSD1306 &display) {
-    static uint8_t lastStateNext = HIGH;
-    static uint8_t lastStateSelect = HIGH;
+    uint8_t lastStateNext = HIGH;
+    uint8_t lastStateSelect = HIGH;
 
     uint8_t currentStateNext = digitalRead(BUTTON_NEXT);
     uint8_t currentStateSelect = digitalRead(BUTTON_SELECT);
@@ -54,9 +61,10 @@ void handleMainMenuNavigation(uint8_t &selectedIndex, bool &inSettings, bool &in
         Serial.println("Main Menu: Select button pressed (LOW)");
         switch (selectedIndex) {
             case 0: // WiFi
-                inWiFiMenu = true;
-                showFakeAPMenu(display); // For now directly go to FakeAP menu for testing //showWiFiMenu(display); // Transition to WiFi Menu - showWiFiMenu needs to be updated to take display
-                Serial.println("Entering WiFi Menu from Main Menu");
+                Serial.println("WiFi selected in Main Menu");
+                inMainMenu = false; // Exit Main Menu
+                inWiFiMenu = true;  // Enter WiFi Menu
+                showWiFiMenu(display); // Now show WiFi Menu!
                 break;
             case 1:
                 Serial.println("Radio");

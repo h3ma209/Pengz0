@@ -44,10 +44,10 @@ void handleEvilTwinMenuNavigation(Adafruit_SSD1306 &display) {
     Serial.print("Current evilTwinIndex (start of function): ");
     Serial.println(evilTwinIndex); // Print index at start
 
-    static uint8_t lastStateNextEvilTwin = HIGH;
-    static uint8_t currentStateNextEvilTwin = digitalRead(BUTTON_NEXT);
-    static uint8_t lastStateSelectEvilTwin = HIGH;
-    static uint8_t currentStateSelectEvilTwin = digitalRead(BUTTON_SELECT);
+    uint8_t lastStateNextEvilTwin = HIGH;
+    uint8_t currentStateNextEvilTwin = digitalRead(BUTTON_NEXT);
+    uint8_t lastStateSelectEvilTwin = HIGH;
+    uint8_t currentStateSelectEvilTwin = digitalRead(BUTTON_SELECT);
 
     Serial.print("BUTTON_NEXT state: ");
     Serial.println(currentStateNextEvilTwin); // Button states
