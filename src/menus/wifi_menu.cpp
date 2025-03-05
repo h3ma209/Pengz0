@@ -48,10 +48,10 @@ void handleWiFiMenuNavigation(Adafruit_SSD1306 &display) {
     uint8_t currentStateNextWiFi = digitalRead(BUTTON_NEXT);
     uint8_t currentStateSelectWiFi = digitalRead(BUTTON_SELECT);
 
-    Serial.print("BUTTON_NEXT state: "); // <---- ADD THIS PRINT - button state
-    Serial.println(currentStateNextWiFi);
-    Serial.print("BUTTON_SELECT state: "); // <---- ADD THIS PRINT - button state
-    Serial.println(currentStateSelectWiFi);
+    // Serial.print("BUTTON_NEXT state: "); // <---- ADD THIS PRINT - button state
+    // Serial.println(currentStateNextWiFi);
+    // Serial.print("BUTTON_SELECT state: "); // <---- ADD THIS PRINT - button state
+    // Serial.println(currentStateSelectWiFi);
 
     if (currentStateNextWiFi == LOW && lastStateNextWiFi == HIGH) {
         Serial.println("WiFi Menu NEXT button pressed (LOW)");

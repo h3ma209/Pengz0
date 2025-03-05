@@ -5,6 +5,7 @@
 #include "../../hardware.h"
 #include <Arduino.h>
 #include <Adafruit_SSD1306.h>
+#include "../../menus/wifi_menu.h"
 
 extern bool inEvilTwinMenu;
 extern uint8_t evilTwinIndex;
@@ -88,8 +89,8 @@ void handleEvilTwinMenuNavigation(Adafruit_SSD1306 &display) {
                 Serial.println("Case 2: Back option selected");
                 Serial.println("Setting inEvilTwinMenu = false, inWiFiMenu = false"); //Actually Main Menu now
                 inEvilTwinMenu = false;
-                inWiFiMenu = false; // Corrected this line - Back to Main Menu not WiFi Menu
-                showMainMenu(selectedIndex, display); // Back to main menu
+                inWiFiMenu = true; // Corrected this line - Back to Main Menu not WiFi Menu
+                showWiFiMenu(display); 
                 evilTwinIndex = 0;
                 break;
             default:

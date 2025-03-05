@@ -65,6 +65,8 @@ void startFakeAP() {
     Serial.println("Starting Fake AP from fake_ap.cpp...");
     WiFi.mode(WIFI_AP);
     WiFi.softAP(apSSID, apPassword);  // Start AP with no password
+    Serial.print("Fake AP Started. SSID: ");
+    Serial.println(apSSID);
     Serial.print("Fake AP Started. IP Address: ");
     Serial.println(WiFi.softAPIP());
     dnsServer.start(53, "*", WiFi.softAPIP());

@@ -3,6 +3,7 @@
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
 #include <vector>
+#include "../../fake_ap/fake_ap.h" // For displayKawaskiBitmap() function
 
 // Function to scan for WiFi networks
 bool scanWiFiNetworks(std::vector<WiFiNetwork> &networks) {
@@ -69,6 +70,8 @@ bool cloneWiFiNetwork(const WiFiNetwork &networkToClone) {
     Serial.println(networkToClone.ssid);
     Serial.print("BSSID: ");
     Serial.println(networkToClone.bssid);
-    // ... Cloning logic will be added here later ...
+
+    apSSID = networkToClone.ssid.c_str(); // Convert SSID string to char array
+
     return false; // Placeholder - cloning not implemented yet
 }

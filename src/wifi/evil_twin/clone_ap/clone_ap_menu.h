@@ -7,5 +7,5 @@
 
 void showCloneAPNetworkMenu(Adafruit_SSD1306 &display);
 void handleCloneAPNetworkMenuNavigation(Adafruit_SSD1306 &display);
-
+void scanForNetworks();
 #endif

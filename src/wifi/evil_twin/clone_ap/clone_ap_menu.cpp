@@ -5,6 +5,7 @@
 #include <Adafruit_SSD1306.h>
 #include "../../../wifi/wifi.h" // For WiFiNetwork struct and cloneWiFiNetwork function
 #include "../evil_twin_menu.h"
+#include "../../fake_ap/fake_ap.h"
 
 extern bool inCloneAPMenu;
 extern uint8_t cloneAPIndex;
@@ -15,9 +16,37 @@ extern bool inWiFiMenu; // Actually Main Menu now but used to control menu level
 extern uint8_t wifiIndex; //Actually selectedIndex in Main Menu now but used to control menu level index
 extern uint8_t selectedIndex;
 // Function to display the Clone AP Network Menu
+
+
+void scanForNetworks() {
+    Serial.println("\n--- scanForNetworks() CALLED ---"); // Added entry print
+    Serial.println("Scanning for networks...");
+    int numNetworks = WiFi.scanNetworks();
+    scannedNetworks.clear();
+    for (int i = 0; i < numNetworks; ++i) {
+        WiFiNetwork network;
+        network.ssid = WiFi.SSID(i);
+        network.rssi = WiFi.RSSI(i);
+        network.bssid = WiFi.BSSIDstr(i);
+        network.encryptionType = WiFi.encryptionType(i);
+        scannedNetworks.push_back(network);
+    }
+    Serial.println("Networks scanned!");
+    Serial.print("Number of networks found: ");
+    Serial.println(scannedNetworks.size());
+    Serial.println("--- scanForNetworks() END ---"); // Added exit print
+}
+
 void showCloneAPNetworkMenu(Adafruit_SSD1306 &display) {
     Serial.println("\n--- showCloneAPNetworkMenu() CALLED ---"); // Added entry print
     Serial.print("Current cloneAPIndex: ");
+
+    if(scannedNetworks.empty()) {
+        scanForNetworks();
+        displayKawaskiBitmap();
+    }
+
+    
     Serial.println(cloneAPIndex); // Print index at start
     display.clearDisplay();
     display.setTextSize(1);
@@ -41,7 +70,7 @@ void showCloneAPNetworkMenu(Adafruit_SSD1306 &display) {
             display.setTextColor(SSD1306_WHITE);
         }
         display.setCursor(10, 20 + (i * 10));
-        display.println(scannedNetworks[i].ssid);
+        display.println(scannedNetworks[i].ssid + " : " + scannedNetworks[i].bssid);
     }
 
     if (cloneAPIndex == scannedNetworks.size()) {
@@ -57,8 +86,8 @@ void showCloneAPNetworkMenu(Adafruit_SSD1306 &display) {
 }
 
 void handleCloneAPNetworkMenuNavigation(Adafruit_SSD1306 &display) {
-    Serial.println("\n--- handleCloneAPNetworkMenuNavigation() CALLED ---"); // Added entry print
-    Serial.print("Current cloneAPIndex (start of function): ");
+    // Serial.println("\n--- handleCloneAPNetworkMenuNavigation() CALLED ---"); // Added entry print
+    // Serial.print("Current cloneAPIndex (start of function): ");
     Serial.println(cloneAPIndex); // Print index at start
 
     static uint8_t lastStateNextCloneAP = HIGH;
@@ -66,10 +95,10 @@ void handleCloneAPNetworkMenuNavigation(Adafruit_SSD1306 &display) {
     static uint8_t lastStateSelectCloneAP = HIGH;
     uint8_t currentStateSelectCloneAP = digitalRead(BUTTON_SELECT);
 
-    Serial.print("BUTTON_NEXT state: ");
-    Serial.println(currentStateNextCloneAP); // Button states
-    Serial.print("BUTTON_SELECT state: ");
-    Serial.println(currentStateSelectCloneAP);
+    // Serial.print("BUTTON_NEXT state: ");
+    // Serial.println(currentStateNextCloneAP); // Button states
+    // Serial.print("BUTTON_SELECT state: ");
+    // Serial.println(currentStateSelectCloneAP);
 
     if (currentStateNextCloneAP == LOW && lastStateNextCloneAP == HIGH) {
         Serial.println("CloneAP Menu NEXT button pressed (LOW)");
@@ -94,7 +123,6 @@ void handleCloneAPNetworkMenuNavigation(Adafruit_SSD1306 &display) {
             Serial.println(selectedNetwork.ssid);
             Serial.println("Setting inCloneAPMenu = false, inEvilTwinMenu = true");
             cloneWiFiNetwork(selectedNetwork);
-
             inCloneAPMenu = false;
             inEvilTwinMenu = true;
             showEvilTwinMenu(display);
@@ -105,6 +133,7 @@ void handleCloneAPNetworkMenuNavigation(Adafruit_SSD1306 &display) {
             Serial.println("Setting inCloneAPMenu = false, inEvilTwinMenu = true");
             inCloneAPMenu = false;
             inEvilTwinMenu = true;
+            scannedNetworks.clear();
             showEvilTwinMenu(display);
             cloneAPIndex = 0;
         } else {
