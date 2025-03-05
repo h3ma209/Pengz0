@@ -1,8 +1,10 @@
+// src/wifi/evil_twin/clone_ap/clone_ap.h
 #ifndef CLONE_AP_H
 #define CLONE_AP_H
 
 #include <ESP8266WiFi.h>
 #include <vector> // For using std::vector to store scanned networks
+#include <Arduino.h>
 
 // Struct to hold information about a scanned WiFi network
 struct WiFiNetwork {
@@ -13,9 +15,9 @@ struct WiFiNetwork {
 };
 
 // Function prototypes
-bool scanWiFiNetworks(std::vector<WiFiNetwork>& networks);
-void printScannedNetworks(const std::vector<WiFiNetwork>& networks); // For debugging - print to Serial
-bool cloneWiFiNetwork(const WiFiNetwork& networkToClone); // Cloning function prototype
+bool scanWiFiNetworks(std::vector<WiFiNetwork> &networks);
+void printScannedNetworks(const std::vector<WiFiNetwork> &networks); // For debugging - print to Serial
+bool cloneWiFiNetwork(const WiFiNetwork &networkToClone); // Cloning function prototype
 
 
 #endif // CLONE_AP_H

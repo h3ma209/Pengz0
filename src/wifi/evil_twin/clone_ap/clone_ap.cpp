@@ -1,10 +1,11 @@
-#include "wifi/clone_ap.h"
+// src/wifi/evil_twin/clone_ap/clone_ap.cpp
+#include "clone_ap.h"
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
 #include <vector>
 
 // Function to scan for WiFi networks
-bool scanWiFiNetworks(std::vector<WiFiNetwork>& networks) {
+bool scanWiFiNetworks(std::vector<WiFiNetwork> &networks) {
     Serial.println("Starting WiFi scan...");
     networks.clear(); // Clear any previous scan results
 
@@ -41,7 +42,7 @@ bool scanWiFiNetworks(std::vector<WiFiNetwork>& networks) {
 }
 
 // Function to print scanned networks (for debugging)
-void printScannedNetworks(const std::vector<WiFiNetwork>& networks) {
+void printScannedNetworks(const std::vector<WiFiNetwork> &networks) {
     Serial.println("\n----- Scanned WiFi Networks -----");
     if (networks.empty()) {
         Serial.println("No networks in the list.");
@@ -63,7 +64,7 @@ void printScannedNetworks(const std::vector<WiFiNetwork>& networks) {
 
 
 // Placeholder function for cloning a WiFi network - IMPLEMENTATION PENDING
-bool cloneWiFiNetwork(const WiFiNetwork& networkToClone) {
+bool cloneWiFiNetwork(const WiFiNetwork &networkToClone) {
     Serial.print("cloneWiFiNetwork() called for SSID: ");
     Serial.println(networkToClone.ssid);
     Serial.print("BSSID: ");
