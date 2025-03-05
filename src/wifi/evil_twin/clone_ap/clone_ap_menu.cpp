@@ -62,9 +62,9 @@ void handleCloneAPNetworkMenuNavigation(Adafruit_SSD1306 &display) {
     Serial.println(cloneAPIndex); // Print index at start
 
     static uint8_t lastStateNextCloneAP = HIGH;
-    static uint8_t currentStateNextCloneAP = digitalRead(BUTTON_NEXT);
+    uint8_t currentStateNextCloneAP = digitalRead(BUTTON_NEXT);
     static uint8_t lastStateSelectCloneAP = HIGH;
-    static uint8_t currentStateSelectCloneAP = digitalRead(BUTTON_SELECT);
+    uint8_t currentStateSelectCloneAP = digitalRead(BUTTON_SELECT);
 
     Serial.print("BUTTON_NEXT state: ");
     Serial.println(currentStateNextCloneAP); // Button states

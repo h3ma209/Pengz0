@@ -47,8 +47,8 @@ void handleMainMenuNavigation(uint8_t &selectedIndex, bool &inSettings, bool &in
     static uint8_t lastStateNext = HIGH;
     static uint8_t lastStateSelect = HIGH;
 
-    static uint8_t currentStateNext = digitalRead(BUTTON_NEXT);
-    static uint8_t currentStateSelect = digitalRead(BUTTON_SELECT);
+    uint8_t currentStateNext = digitalRead(BUTTON_NEXT);
+    uint8_t currentStateSelect = digitalRead(BUTTON_SELECT);
 
     if (currentStateNext == LOW && lastStateNext == HIGH) {
         Serial.println("Main Menu: Next button pressed (LOW)");

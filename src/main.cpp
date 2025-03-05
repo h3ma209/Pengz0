@@ -95,5 +95,5 @@ void loop() {
   } else if (inCloneAPMenu) {
       handleCloneAPNetworkMenuNavigation(display);
   }
-  handleClientRequest(); // Handle captive portal and client requests from wifi.cpp
+  
 }

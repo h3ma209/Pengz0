@@ -2,6 +2,7 @@
 #include "fake_ap_menu.h"
 #include "../../menus/main_menu.h" // Back to main menu
 #include "../../hardware.h"
+#include "../../menus/wifi_menu.h" // Include wifi functionalities
 #include "../../wifi/fake_ap/fake_ap.h" // Include to use startFakeAP and stopFakeAP functions
 #include <Arduino.h>
 #include <Adafruit_SSD1306.h>
@@ -51,9 +52,9 @@ void showFakeAPMenu(Adafruit_SSD1306 &display) {
 
 void handleFakeAPMenuNavigation(Adafruit_SSD1306 &display) {
     static uint8_t lastStateSelectFakeAP = HIGH;
-    static uint8_t currentStateSelectFakeAP = digitalRead(BUTTON_SELECT);
+    uint8_t currentStateSelectFakeAP = digitalRead(BUTTON_SELECT);
     static uint8_t lastStateNextFakeAP = HIGH;      // Track state of NEXT button
-    static uint8_t currentStateNextFakeAP = digitalRead(BUTTON_NEXT); // Read NEXT button state
+    uint8_t currentStateNextFakeAP = digitalRead(BUTTON_NEXT); // Read NEXT button state
 
     // --- Handle SELECT button ---
     if (currentStateSelectFakeAP == LOW && lastStateSelectFakeAP == HIGH) {
@@ -74,9 +75,9 @@ void handleFakeAPMenuNavigation(Adafruit_SSD1306 &display) {
             case 2: // "Back" option
                 Serial.println("Back option selected in FakeAP Menu from fake_ap_menu.cpp");
                 inFakeAPMenu = false;
-                inWiFiMenu = false; //Actually Main Menu now
-                showMainMenu(selectedIndex, display);
                 fakeAPIndex = 0;
+                inWiFiMenu = true; //Actually Main Menu now
+                showWiFiMenu(display);
                 break;
             default:
                 Serial.println("Unexpected fakeAPIndex in handleFakeAPMenuNavigation from fake_ap_menu.cpp");
