@@ -13,7 +13,7 @@
 // External variables - Declarations (these are DEFINED in main.cpp)
 extern DNSServer dnsServer;
 extern ESP8266WebServer webServer;
-extern const char *apSSID;
+extern char apSSID[50];;
 extern const char *apPassword;
 extern const char *captivePortalPage;
 extern bool fakeAPEnabled;

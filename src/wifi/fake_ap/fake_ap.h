@@ -10,7 +10,7 @@
 // External variables (defined in main sketch) that Fake AP code needs to access
 extern DNSServer dnsServer;
 extern ESP8266WebServer webServer;
-extern const char *apSSID;
+extern char apSSID[50];;
 extern const char *apPassword;
 extern const char *captivePortalPage;
 extern bool fakeAPEnabled;

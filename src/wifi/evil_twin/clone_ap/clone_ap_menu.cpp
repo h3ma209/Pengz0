@@ -53,7 +53,7 @@ void showCloneAPNetworkMenu(Adafruit_SSD1306 &display) {
     display.setTextColor(SSD1306_WHITE);
 
     display.setCursor(10, 10);
-    display.println("Clone AP - Select Network");
+    display.println("Select AP to Clone");
 
     if (scannedNetworks.empty()) {
         display.setCursor(10, 20);
@@ -70,7 +70,9 @@ void showCloneAPNetworkMenu(Adafruit_SSD1306 &display) {
             display.setTextColor(SSD1306_WHITE);
         }
         display.setCursor(10, 20 + (i * 10));
-        display.println(scannedNetworks[i].ssid + " : " + scannedNetworks[i].bssid);
+        // display.println(scannedNetworks[i].ssid + " : " + scannedNetworks[i].bssid);
+        display.println(scannedNetworks[i].ssid);
+
     }
 
     if (cloneAPIndex == scannedNetworks.size()) {

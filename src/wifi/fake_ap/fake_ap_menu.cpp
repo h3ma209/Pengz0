@@ -26,12 +26,15 @@ void showFakeAPMenu(Adafruit_SSD1306 &display) {
     display.print("Status: ");
     if (fakeAPEnabled) {
         display.println("ON");
+        
     } else {
         display.println("OFF");
     }
-
     display.setCursor(10, 10); // Move cursor down for the menu title
-    display.println("Fake AP Menu"); // Title for Fake AP Menu
+    display.print("SSID: ");
+    display.println(apSSID); // Title for Fake AP Menu
+    // display.setCursor(10, 10); // Move cursor down for the menu title
+    // display.println("Fake AP Menu"); // Title for Fake AP Menu
 
     const char *fakeAPOptions[3] = {"Turn On", "Turn Off", "Back"}; // Fake AP Submenu options
 

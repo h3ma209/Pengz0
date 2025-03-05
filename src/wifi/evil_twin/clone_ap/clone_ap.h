@@ -18,6 +18,7 @@ struct WiFiNetwork {
 bool scanWiFiNetworks(std::vector<WiFiNetwork> &networks);
 void printScannedNetworks(const std::vector<WiFiNetwork> &networks); // For debugging - print to Serial
 bool cloneWiFiNetwork(const WiFiNetwork &networkToClone); // Cloning function prototype
+void setAPSSID(String ssid); // Set the SSID for the cloned AP
 
 
 #endif // CLONE_AP_H

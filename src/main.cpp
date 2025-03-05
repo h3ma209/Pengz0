@@ -39,7 +39,7 @@ DNSServer dnsServer;
 ESP8266WebServer webServer;
 
 // Fake AP settings - Definitions (memory allocation)
-const char* apSSID = "FTBLL EDITZ hema pooppeeee ^vvv^";
+char apSSID[50] = "FakeAP";
 const char* apPassword = "";
 const char* captivePortalPage = "<html><body><h1>Welcome to the Fake AP!</h1><p>You are now connected to the Fake AP.</p></body></html>";
 

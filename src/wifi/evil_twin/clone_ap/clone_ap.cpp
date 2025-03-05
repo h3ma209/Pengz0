@@ -71,7 +71,12 @@ bool cloneWiFiNetwork(const WiFiNetwork &networkToClone) {
     Serial.print("BSSID: ");
     Serial.println(networkToClone.bssid);
 
-    apSSID = networkToClone.ssid.c_str(); // Convert SSID string to char array
+    setAPSSID(networkToClone.ssid); // Set the AP SSID to the network to clone
 
     return false; // Placeholder - cloning not implemented yet
+}
+
+void setAPSSID(String ssid) {
+    strncpy(apSSID, ssid.c_str(), sizeof(apSSID) - 1);
+    apSSID[sizeof(apSSID) - 1] = '\0'; // Ensure null termination
 }

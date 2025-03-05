@@ -14,7 +14,7 @@ extern uint8_t settingIndex;
 extern bool inSettings;
 extern DNSServer dnsServer;
 extern ESP8266WebServer webServer;
-extern const char *apSSID;
+extern char apSSID[50];;
 extern const char *apPassword;
 extern const char *captivePortalPage;
 extern bool inFakeAPMenu;
