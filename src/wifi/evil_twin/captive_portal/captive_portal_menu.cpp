@@ -11,7 +11,7 @@ extern bool captivePortalEnabled;
 
 extern bool inEvilTwinMenu;
 extern uint8_t evilTwinIndex;
-
+extern int portalIndex;
 
 void showCaptivePortalMenu(Adafruit_SSD1306 &display){
     Serial.println("\n --- showCaptivePortalMenu() CALLED ---"); // Added entry print
@@ -67,15 +67,19 @@ void handleCaptivePortalMenuNavigation(Adafruit_SSD1306 &display){
         switch(captivePortalIndex){
             case 0:
                 Serial.println("IQ Login");
+                portalIndex = 0;
                 break;
             case 1:
                 Serial.println("Google Login");
+                portalIndex = 1;
                 break;
             case 2:
                 Serial.println("MyKomar");
+                portalIndex = 2;
                 break;
             case 3:
                 Serial.println("Komar Cap");
+                portalIndex = 3;
                 break;
             case 4:
                 inCaptivePortalMenu = false;

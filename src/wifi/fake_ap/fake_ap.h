@@ -22,6 +22,7 @@ void startFakeAP();
 void stopFakeAP();
 void displayKawaskiBitmap();
 void displayBeegYoshiBitmap();
+void loopAP();
 
 
 #endif // FAKE_AP_H
