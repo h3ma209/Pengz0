@@ -5,6 +5,7 @@
 #include "../../hardware.h"
 #include <Arduino.h>
 #include <Adafruit_SSD1306.h>
+#include "captive_portal/captive_portal_menu.h"
 #include "../../menus/wifi_menu.h"
 
 extern bool inEvilTwinMenu;
@@ -13,6 +14,9 @@ extern bool inCloneAPMenu;
 extern bool inWiFiMenu; // Actually Main Menu now but used to control menu level
 extern uint8_t wifiIndex; //Actually selectedIndex in Main Menu now but used to control menu level index
 extern uint8_t selectedIndex;
+
+extern bool inCaptivePortalMenu;
+
 
 void showEvilTwinMenu(Adafruit_SSD1306 &display) {
     Serial.println("\n--- showEvilTwinMenu() CALLED ---"); // Added entry print
@@ -83,7 +87,9 @@ void handleEvilTwinMenuNavigation(Adafruit_SSD1306 &display) {
             case 1: // "Captive Portal" selected
                 Serial.println("Case 1: Captive Portal selected");
                 Serial.println("Going back to EvilTwinMenu (Captive Portal not implemented)");
-                showEvilTwinMenu(display); // For now, go back to Evil Twin menu
+                inEvilTwinMenu = false;
+                inCaptivePortalMenu = true;
+                showCaptivePortalMenu(display);
                 break;
             case 2: // "Back" option
                 Serial.println("Case 2: Back option selected");

@@ -10,6 +10,7 @@
 #include "wifi/evil_twin/evil_twin_menu.h"
 #include "wifi/evil_twin/clone_ap/clone_ap_menu.h" // Make sure to include clone_ap_menu.h
 #include "menus/wifi_menu.h"     // Include WiFi Menu
+#include "wifi/evil_twin/captive_portal/captive_portal_menu.h"
 
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64
@@ -34,6 +35,10 @@ std::vector<WiFiNetwork> scannedNetworks;
 bool inEvilTwinMenu = false;
 uint8_t evilTwinIndex= 0;
 
+bool inCaptivePortalMenu = false;
+uint8_t captivePortalIndex = 0;
+bool captivePortalEnabled = false;
+
 // Captive Portal variables - Definitions (memory allocation)
 DNSServer dnsServer;
 ESP8266WebServer webServer;
@@ -41,7 +46,8 @@ ESP8266WebServer webServer;
 // Fake AP settings - Definitions (memory allocation)
 char apSSID[50] = "FakeAP";
 const char* apPassword = "";
-const char* captivePortalPage = "<html><body><h1>Welcome to the Fake AP!</h1><p>You are now connected to the Fake AP.</p></body></html>";
+// const char* captivePortalPage = "<html><body><h1>Welcome to the Fake AP!</h1><p>You are now connected to the Fake AP.</p></body></html>";
+String captivePortalPage = "<html><body><h1>Welcome to the Fake AP!</h1><p>You are now connected to the Fake AP.</p></body></html>";
 
 // OLED display
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
@@ -62,6 +68,12 @@ extern uint8_t cloneAPIndex;        // Defined here, used in clone_ap_menu.cpp, 
 extern std::vector<WiFiNetwork> scannedNetworks; // Defined here, used in wifi.cpp, clone_ap_menu.cpp
 extern bool inEvilTwinMenu;      // Defined here, used in evil_twin_menu.cpp, wifi_menu.cpp, clone_ap_menu.cpp
 extern uint8_t evilTwinIndex;       // Defined here, used in evil_twin_menu.cpp, wifi_menu.cpp
+
+extern bool inCaptivePortalMenu;  // Defined here, used in captive_portal_menu.cpp, evil_twin_menu.cpp, wifi_menu.cpp
+extern uint8_t captivePortalIndex; // Defined here, used in captive_portal_menu.cpp, evil_twin_menu.cpp, wifi_menu.cpp
+extern bool captivePortalEnabled; // Defined here, used in captive_portal_menu.cpp, evil_twin_menu.cpp, wifi_menu.cpp
+
+
 
 void setup() {
   Serial.begin(9600);
@@ -94,6 +106,9 @@ void loop() {
       handleEvilTwinMenuNavigation(display);
   } else if (inCloneAPMenu) {
       handleCloneAPNetworkMenuNavigation(display);
+  }
+  else if (inCaptivePortalMenu) {
+      handleCaptivePortalMenuNavigation(display);
   }
   
 }

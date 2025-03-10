@@ -8,16 +8,17 @@
 #include <Adafruit_GFX.h> // Include for display usage
 #include "../../bitmaps/beegyoshi.h"
 #include "../../bitmaps/kawaski.h"
-
+#include "../evil_twin/captive_portal/portals/portals.h"
 
 // External variables - Declarations (these are DEFINED in main.cpp)
 extern DNSServer dnsServer;
 extern ESP8266WebServer webServer;
 extern char apSSID[50];;
 extern const char *apPassword;
-extern const char *captivePortalPage;
+extern String captivePortalPage;
 extern bool fakeAPEnabled;
 extern Adafruit_SSD1306 display;
+String cp;
 
 void displayBeegYoshiBitmap() {
     Serial.println("Displaying BeegYoshi Bitmap from fake_ap.cpp");
@@ -64,18 +65,36 @@ void startFakeAP() {
     displayKawaskiBitmap();
     Serial.println("Starting Fake AP from fake_ap.cpp...");
     WiFi.mode(WIFI_AP);
-    WiFi.softAP(apSSID, apPassword);  // Start AP with no password
+    WiFi.softAP(apSSID, apPassword, 1, 0, 4);  // Start AP with no password, channel 1, hidden SSID, max 4 connections
     Serial.print("Fake AP Started. SSID: ");
     Serial.println(apSSID);
     Serial.print("Fake AP Started. IP Address: ");
     Serial.println(WiFi.softAPIP());
     dnsServer.start(53, "*", WiFi.softAPIP());
+
+    if (portalIndex == 0) {
+        cp = IQcaptivePortalPage;
+    } else if (portalIndex == 1) {
+        cp = KOMARcaptivePortalPage;
+    } else if (portalIndex == 2) {
+        cp = MYKOMARcaptivePortalPage;
+    } else {
+        cp = captivePortalPage;
+    }
+
     webServer.on("/", HTTP_GET, []() {
-        webServer.send(200, "text/html", captivePortalPage);
+        webServer.send(200, "text/html", cp);
     });
     webServer.begin();
     fakeAPEnabled = true; // Set flag to enabled
     Serial.println("FakeAPEnabled set to true in fake_ap.cpp");
+
+    // Handle clients
+    while (fakeAPEnabled) {
+        dnsServer.processNextRequest();
+        webServer.handleClient();
+        delay(10); // Small delay to prevent watchdog reset
+    }
 }
 
 // Stop Fake Access Point

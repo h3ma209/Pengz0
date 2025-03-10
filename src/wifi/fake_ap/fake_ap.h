@@ -12,7 +12,7 @@ extern DNSServer dnsServer;
 extern ESP8266WebServer webServer;
 extern char apSSID[50];;
 extern const char *apPassword;
-extern const char *captivePortalPage;
+extern String captivePortalPage;
 extern bool fakeAPEnabled;
 extern Adafruit_SSD1306 display; // For potential display updates from FakeAP code if needed
 

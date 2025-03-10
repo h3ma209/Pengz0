@@ -16,7 +16,7 @@ extern DNSServer dnsServer;
 extern ESP8266WebServer webServer;
 extern char apSSID[50];;
 extern const char *apPassword;
-extern const char *captivePortalPage;
+extern String captivePortalPage;
 extern bool inFakeAPMenu;
 extern uint8_t fakeAPIndex;
 extern bool fakeAPEnabled;
