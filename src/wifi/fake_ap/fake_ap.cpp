@@ -72,7 +72,7 @@ void startFakeAP() {
 
         displayKawaskiBitmap();
         WiFi.mode(WIFI_AP);
-        WiFi.softAP(apSSID, "12345678");  // Start AP with no password, channel 1, hidden SSID, max 4 connections
+        WiFi.softAP(apSSID, apPassword);  // Start AP with no password, channel 1, hidden SSID, max 4 connections
 
         WiFi.softAPConfig(apIP, apIP, IPAddress(255, 255, 255, 0)); // Set IP range for AP
 
