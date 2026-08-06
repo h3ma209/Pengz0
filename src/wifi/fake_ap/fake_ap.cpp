@@ -13,8 +13,51 @@
 static String currentPortalHtml;
 static IPAddress apIP(192, 168, 1, 1);
 
+// OS probes these URLs. Wrong reply → "Connected, no internet".
+// Correct success reply → OS thinks online (portal still at /).
+
 static void handleRoot() {
   webServer.send(200, "text/html", currentPortalHtml);
+}
+
+static void handleAndroid204() {
+  webServer.send(204, "text/plain", "");
+}
+
+static void handleAppleSuccess() {
+  webServer.send(200, "text/html",
+                 F("<HTML><HEAD><TITLE>Success</TITLE></HEAD>"
+                   "<BODY>Success</BODY></HTML>"));
+}
+
+static void handleWindowsNCSI() {
+  webServer.send(200, "text/plain", F("Microsoft Connect Test"));
+}
+
+static void handleWindowsNCSIAlt() {
+  webServer.send(200, "text/plain", F("Microsoft NCSI"));
+}
+
+static void handleConnectivityOrPortal() {
+  const String &uri = webServer.uri();
+
+  if (uri.indexOf(F("generate_204")) >= 0 || uri.indexOf(F("gen_204")) >= 0 ||
+      uri.indexOf(F("connecttest")) >= 0 || uri.indexOf(F("ncsi")) >= 0 ||
+      uri.indexOf(F("hotspot-detect")) >= 0 || uri.indexOf(F("success.txt")) >= 0 ||
+      uri.indexOf(F("canonical.html")) >= 0 || uri.indexOf(F("kindle-wifi")) >= 0) {
+    if (uri.indexOf(F("hotspot-detect")) >= 0 || uri.indexOf(F("canonical.html")) >= 0) {
+      handleAppleSuccess();
+    } else if (uri.indexOf(F("connecttest")) >= 0) {
+      handleWindowsNCSI();
+    } else if (uri.indexOf(F("ncsi")) >= 0) {
+      handleWindowsNCSIAlt();
+    } else {
+      handleAndroid204();
+    }
+    return;
+  }
+
+  handleRoot();
 }
 
 void displayBeegYoshiBitmap() {
@@ -59,11 +102,24 @@ void startFakeAP() {
     currentPortalHtml = captivePortalPage;
   }
 
+  // Captive portal page (open http://192.168.1.1/ manually)
   webServer.on("/", handleRoot);
-  webServer.on("/generate_204", handleRoot);
-  webServer.on("/hotspot-detect.html", handleRoot);
-  webServer.on("/redirect", handleRoot);
-  webServer.onNotFound(handleRoot);
+
+  // Android
+  webServer.on("/generate_204", handleAndroid204);
+  webServer.on("/gen_204", handleAndroid204);
+
+  // Apple / iOS
+  webServer.on("/hotspot-detect.html", handleAppleSuccess);
+  webServer.on("/library/test/success.html", handleAppleSuccess);
+
+  // Windows
+  webServer.on("/connecttest.txt", handleWindowsNCSI);
+  webServer.on("/ncsi.txt", handleWindowsNCSIAlt);
+  webServer.on("/redirect", handleAndroid204);
+
+  // Catch-all: spoof known probes, else show portal
+  webServer.onNotFound(handleConnectivityOrPortal);
   webServer.begin();
 
   fakeAPEnabled = true;
