@@ -1,107 +1,63 @@
-// src/menus/fake_ap_menu.cpp
 #include "fake_ap_menu.h"
-#include "../../menus/main_menu.h" // Back to main menu
+#include "../../app_state.h"
+#include "../../buttons.h"
 #include "../../hardware.h"
-#include "../../menus/wifi_menu.h" // Include wifi functionalities
-#include "../../wifi/fake_ap/fake_ap.h" // Include to use startFakeAP and stopFakeAP functions
-#include <Arduino.h>
-#include <Adafruit_SSD1306.h>
-
-extern bool inFakeAPMenu;
-extern uint8_t fakeAPIndex;
-extern bool fakeAPEnabled;
-extern bool inWiFiMenu; // Actually Main Menu now but used to control menu level
-extern uint8_t wifiIndex; //Actually selectedIndex in Main Menu now but used to control menu level index
-extern uint8_t selectedIndex;
-
+#include "../../menus/wifi_menu.h"
+#include "fake_ap.h"
 
 void showFakeAPMenu(Adafruit_SSD1306 &display) {
-    Serial.println("showFakeAPMenu() function called from fake_ap_menu.cpp"); // ADDED
-    display.clearDisplay();
-    display.setTextSize(1);
-    display.setTextColor(SSD1306_WHITE);
+  display.clearDisplay();
+  display.setTextSize(1);
+  display.setTextColor(SSD1306_WHITE);
 
-    // Display Fake AP Status
-    display.setCursor(10, 0); // Position at the top
-    display.print("Status: ");
-    if (fakeAPEnabled) {
-        display.println("ON");
-        
+  display.setCursor(0, 0);
+  display.print(F("Status: "));
+  display.println(fakeAPEnabled ? F("ON") : F("OFF"));
+
+  display.setCursor(0, 10);
+  display.print(F("SSID: "));
+  display.println(apSSID);
+
+  static const char *const options[] = {"Turn On", "Turn Off", "Back"};
+  for (uint8_t i = 0; i < 3; i++) {
+    if (i == fakeAPIndex) {
+      display.setTextColor(SSD1306_BLACK, SSD1306_WHITE);
     } else {
-        display.println("OFF");
+      display.setTextColor(SSD1306_WHITE);
     }
-    display.setCursor(10, 10); // Move cursor down for the menu title
-    display.print("SSID: ");
-    display.println(apSSID); // Title for Fake AP Menu
-    // display.setCursor(10, 10); // Move cursor down for the menu title
-    // display.println("Fake AP Menu"); // Title for Fake AP Menu
-
-    const char *fakeAPOptions[3] = {"Turn On", "Turn Off", "Back"}; // Fake AP Submenu options
-
-    // Loop through Fake AP submenu options
-    for (uint8_t i = 0; i < 3; i++) {
-        if (i == fakeAPIndex) {
-            display.setTextColor(SSD1306_BLACK, SSD1306_WHITE); // Highlighted item
-        } else {
-            display.setTextColor(SSD1306_WHITE);
-        }
-
-        display.setCursor(10, 20 + (i * 10));
-        display.println(fakeAPOptions[i]);
-    }
-
-    display.display();
+    display.setCursor(0, 24 + (i * 12));
+    display.println(options[i]);
+  }
+  display.display();
 }
 
 void handleFakeAPMenuNavigation(Adafruit_SSD1306 &display) {
-    static uint8_t lastStateSelectFakeAP = HIGH;
-    uint8_t currentStateSelectFakeAP = digitalRead(BUTTON_SELECT);
-    static uint8_t lastStateNextFakeAP = HIGH;      // Track state of NEXT button
-    uint8_t currentStateNextFakeAP = digitalRead(BUTTON_NEXT); // Read NEXT button state
+  static uint8_t lastNext = HIGH;
+  static uint8_t lastSelect = HIGH;
 
-    // --- Handle SELECT button ---
-    if (currentStateSelectFakeAP == LOW && lastStateSelectFakeAP == HIGH) {
-        Serial.println("FakeAP Menu Select button pressed (LOW) from fake_ap_menu.cpp");
-        Serial.print("FakeAP Selected Index: ");
-        Serial.println(fakeAPIndex);
-        switch (fakeAPIndex) {
-            case 0: // "Turn On" selected
-                Serial.println("Turn On Fake AP selected from fake_ap_menu.cpp");
-                startFakeAP();
-                showFakeAPMenu(display);
-                break;
-            case 1: // "Turn Off" selected
-                Serial.println("Turn Off Fake AP selected from fake_ap_menu.cpp");
-                stopFakeAP();
-                showFakeAPMenu(display);
-                break;
-            case 2: // "Back" option
-                Serial.println("Back option selected in FakeAP Menu from fake_ap_menu.cpp");
-                inFakeAPMenu = false;
-                fakeAPIndex = 0;
-                inWiFiMenu = true; //Actually Main Menu now
-                showWiFiMenu(display);
-                break;
-            default:
-                Serial.println("Unexpected fakeAPIndex in handleFakeAPMenuNavigation from fake_ap_menu.cpp");
-                break;
-        }
-        delay(200); // Debounce delay (consider making this non-blocking if needed)
+  if (buttonEdge(BUTTON_NEXT, lastNext)) {
+    fakeAPIndex = (fakeAPIndex + 1) % 3;
+    showFakeAPMenu(display);
+    delay(BUTTON_DEBOUNCE_MS);
+  }
+
+  if (buttonEdge(BUTTON_SELECT, lastSelect)) {
+    switch (fakeAPIndex) {
+      case 0:
+        startFakeAP();
+        showFakeAPMenu(display);
+        break;
+      case 1:
+        stopFakeAP();
+        showFakeAPMenu(display);
+        break;
+      case 2:
+        inFakeAPMenu = false;
+        inWiFiMenu = true;
+        fakeAPIndex = 0;
+        showWiFiMenu(display);
+        break;
     }
-    lastStateSelectFakeAP = currentStateSelectFakeAP; // Update SELECT button last state
-
-
-    // --- Handle NEXT button ---  <--- ADD THIS SECTION
-    if (currentStateNextFakeAP == LOW && lastStateNextFakeAP == HIGH) {
-        Serial.println("FakeAP Menu NEXT button pressed (LOW)");
-        if (fakeAPIndex < 2) { // Assuming 3 options (0, 1, 2 index)
-            fakeAPIndex++;
-        } else {
-            fakeAPIndex = 0; // Wrap around to the first option
-        }
-        Serial.print("fakeAPIndex after NEXT: ");
-        Serial.println(fakeAPIndex);
-        showFakeAPMenu(display); // Update display to show new selection
-    }
-    lastStateNextFakeAP = currentStateNextFakeAP;      // Update NEXT button last state
+    delay(BUTTON_DEBOUNCE_MS);
+  }
 }

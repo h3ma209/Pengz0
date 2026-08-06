@@ -1,82 +1,55 @@
-// src/wifi/evil_twin/clone_ap/clone_ap.cpp
 #include "clone_ap.h"
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
-#include <vector>
-#include "../../fake_ap/fake_ap.h" // For displayKawaskiBitmap() function
+#include <string.h>
+#include "../../../app_state.h"
 
-// Function to scan for WiFi networks
 bool scanWiFiNetworks(std::vector<WiFiNetwork> &networks) {
-    Serial.println("Starting WiFi scan...");
-    networks.clear(); // Clear any previous scan results
+  networks.clear();
+  Serial.println(F("Scanning WiFi..."));
 
-    int n = WiFi.scanNetworks(); // Returns the number of networks found
-    if (n == 0) {
-        Serial.println("No WiFi networks found.");
-        return false; // Scan failed (no networks found is also considered a failure for this example)
-    } else {
-        Serial.print(n);
-        Serial.println(" networks found:");
-        for (int i = 0; i < n; ++i) {
-            WiFiNetwork network;
-            network.ssid = WiFi.SSID(i);
-            network.bssid = WiFi.BSSIDstr(i); // Get BSSID (MAC address) as string
-            network.rssi = WiFi.RSSI(i);
-            network.encryptionType = WiFi.encryptionType(i);
+  WiFi.mode(WIFI_STA);
+  WiFi.disconnect();
+  delay(100);
 
-            networks.push_back(network); // Add the network info to the vector
+  int n = WiFi.scanNetworks();
+  if (n <= 0) {
+    Serial.println(F("No networks found"));
+    return false;
+  }
 
-            // For debugging, print to serial:
-            Serial.print(i + 1);
-            Serial.print(": SSID: ");
-            Serial.print(network.ssid);
-            Serial.print(" | BSSID: ");
-            Serial.print(network.bssid);
-            Serial.print(" | RSSI: ");
-            Serial.print(network.rssi);
-            Serial.print(" | Encryption: ");
-            Serial.println(network.encryptionType); // You can decode encryption type if needed later
-            delay(100); // ചെറിയ delay കൊടുക്കുന്നത് நல்லது serial print-ന്
-        }
-        return true; // Scan successful
-    }
+  for (int i = 0; i < n; ++i) {
+    WiFiNetwork network;
+    network.ssid = WiFi.SSID(i);
+    network.bssid = WiFi.BSSIDstr(i);
+    network.rssi = WiFi.RSSI(i);
+    network.encryptionType = WiFi.encryptionType(i);
+    networks.push_back(network);
+  }
+
+  Serial.print(n);
+  Serial.println(F(" networks found"));
+  return true;
 }
 
-// Function to print scanned networks (for debugging)
 void printScannedNetworks(const std::vector<WiFiNetwork> &networks) {
-    Serial.println("\n----- Scanned WiFi Networks -----");
-    if (networks.empty()) {
-        Serial.println("No networks in the list.");
-    } else {
-        for (size_t i = 0; i < networks.size(); ++i) {
-            Serial.print(i + 1);
-            Serial.print(": SSID: ");
-            Serial.print(networks[i].ssid);
-            Serial.print(" | BSSID: ");
-            Serial.print(networks[i].bssid);
-            Serial.print(" | RSSI: ");
-            Serial.print(networks[i].rssi);
-            Serial.print(" | Encryption: ");
-            Serial.println(networks[i].encryptionType);
-        }
-    }
-    Serial.println("----- End of Scan List -----");
+  for (size_t i = 0; i < networks.size(); ++i) {
+    Serial.print(i + 1);
+    Serial.print(F(": "));
+    Serial.print(networks[i].ssid);
+    Serial.print(F(" RSSI="));
+    Serial.println(networks[i].rssi);
+  }
 }
 
-
-// Placeholder function for cloning a WiFi network - IMPLEMENTATION PENDING
 bool cloneWiFiNetwork(const WiFiNetwork &networkToClone) {
-    Serial.print("cloneWiFiNetwork() called for SSID: ");
-    Serial.println(networkToClone.ssid);
-    Serial.print("BSSID: ");
-    Serial.println(networkToClone.bssid);
-
-    setAPSSID(networkToClone.ssid); // Set the AP SSID to the network to clone
-
-    return false; // Placeholder - cloning not implemented yet
+  Serial.print(F("Clone SSID -> "));
+  Serial.println(networkToClone.ssid);
+  setAPSSID(networkToClone.ssid);
+  return true;
 }
 
 void setAPSSID(String ssid) {
-    strncpy(apSSID, ssid.c_str(), sizeof(apSSID) - 1);
-    apSSID[sizeof(apSSID) - 1] = '\0'; // Ensure null termination
+  strncpy(apSSID, ssid.c_str(), sizeof(apSSID) - 1);
+  apSSID[sizeof(apSSID) - 1] = '\0';
 }

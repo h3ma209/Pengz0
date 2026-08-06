@@ -1,136 +1,91 @@
-// src/wifi/fake_ap/fake_ap.cpp
 #include "fake_ap.h"
-#include <Arduino.h> // For Serial and ESP8266 functions
-#include <ESP8266WiFi.h> // For WiFi functions
-#include <DNSServer.h>   // For DNSServer
-#include <ESP8266WebServer.h> // For WebServer
-#include <Adafruit_SSD1306.h> // Include for display usage
-#include <Adafruit_GFX.h> // Include for display usage
-#include "../../bitmaps/beegyoshi.h" // Ensure this header file defines beegyoshiBitmap
+#include <Arduino.h>
+#include <ESP8266WiFi.h>
+#include <DNSServer.h>
+#include <ESP8266WebServer.h>
+#include <Adafruit_SSD1306.h>
+
+#include "../../app_state.h"
+#include "../../bitmaps/beegyoshi.h"
 #include "../../bitmaps/kawaski.h"
 #include "../evil_twin/captive_portal/portals/portals.h"
 
+static String currentPortalHtml;
+static IPAddress apIP(192, 168, 1, 1);
 
-// External variables - Declarations (these are DEFINED in main.cpp)
-extern DNSServer dnsServer;
-extern ESP8266WebServer webServer;
-extern char apSSID[50];;
-extern const char *apPassword;
-extern String captivePortalPage;
-extern bool fakeAPEnabled;
-extern Adafruit_SSD1306 display;
-String cp;
-IPAddress apIP(192, 168, 1, 1);
-
-void handleRoot(){
-    webServer.send(200, "text/html", cp);
+static void handleRoot() {
+  webServer.send(200, "text/html", currentPortalHtml);
 }
 
 void displayBeegYoshiBitmap() {
-    Serial.println("Displaying BeegYoshi Bitmap from fake_ap.cpp");
-    display.clearDisplay();
-    display.drawBitmap(0, 0, beegyoshiBitmap, 128, 64, SSD1306_WHITE);
-    display.display();
-    Serial.println("BeegYoshi Bitmap displayed from fake_ap.cpp");
-    delay(1000);
-    display.clearDisplay();
-    display.display();
-    Serial.println("Display cleared from fake_ap.cpp");
+  display.clearDisplay();
+  display.drawBitmap(0, 0, beegyoshiBitmap, 128, 64, SSD1306_WHITE);
+  display.display();
+  delay(1000);
+  display.clearDisplay();
+  display.display();
 }
 
 void displayKawaskiBitmap() {
-    Serial.println("Displaying Kawasaki Bitmap from fake_ap.cpp");
-    display.clearDisplay();
-    display.drawBitmap(0, 0, kawaskiBitmap, 128, 64, SSD1306_WHITE);
-
-    display.setTextSize(1);
-    display.setTextColor(SSD1306_BLACK);
-
-    // Calculate vertical center position directly in setCursor
-    display.setCursor(64, 32 - 8); // Right-center, vertically centered calculation inline
-
-    // Write the "Kawaski Analysis" text in two lines
-    display.println("Kawaski");
-    display.setCursor(64, display.getCursorY()); // Move cursor to the next line, same horizontal position
-    display.println("Analysis");
-
-    display.display();
-    Serial.println("Kawasaki Bitmap displayed with right-center text from fake_ap.cpp");
-    delay(1000);
-    display.clearDisplay();
-    display.display();
-    Serial.println("Display cleared from fake_ap.cpp");
+  display.clearDisplay();
+  display.drawBitmap(0, 0, kawaskiBitmap, 128, 64, SSD1306_WHITE);
+  display.setTextSize(1);
+  display.setTextColor(SSD1306_BLACK);
+  display.setCursor(64, 24);
+  display.println(F("Kawaski"));
+  display.setCursor(64, display.getCursorY());
+  display.println(F("Analysis"));
+  display.display();
+  delay(1000);
+  display.clearDisplay();
+  display.display();
 }
 
-// Start Fake Access Point
 void startFakeAP() {
-    if (fakeAPEnabled) {
-        Serial.println("Fake AP already enabled, ignoring start request from fake_ap.cpp.");
-        return; // Do not restart if already enabled
-    }
-    else {
+  if (fakeAPEnabled) {
+    return;
+  }
 
-        displayKawaskiBitmap();
-        WiFi.mode(WIFI_AP);
-        WiFi.softAP(apSSID, apPassword);  // Start AP with no password, channel 1, hidden SSID, max 4 connections
+  displayKawaskiBitmap();
 
-        WiFi.softAPConfig(apIP, apIP, IPAddress(255, 255, 255, 0)); // Set IP range for AP
+  WiFi.mode(WIFI_AP);
+  WiFi.softAPConfig(apIP, apIP, IPAddress(255, 255, 255, 0));
+  WiFi.softAP(apSSID, apPassword);
 
+  dnsServer.start(53, "*", apIP);
 
-        Serial.print("Fake AP Started. SSID: ");
-        Serial.println(apSSID);
-        Serial.print("Fake AP Started. IP Address: ");
-        Serial.println(WiFi.softAPIP());
-        dnsServer.start(53, "*", apIP);
+  currentPortalHtml = portalPageForIndex(portalIndex);
+  if (currentPortalHtml.length() == 0) {
+    currentPortalHtml = captivePortalPage;
+  }
 
-        delay(100);
+  webServer.on("/", handleRoot);
+  webServer.on("/generate_204", handleRoot);
+  webServer.on("/hotspot-detect.html", handleRoot);
+  webServer.on("/redirect", handleRoot);
+  webServer.onNotFound(handleRoot);
+  webServer.begin();
 
-        if (portalIndex == 0) {
-            cp = IQcaptivePortalPage;
-        } else if (portalIndex == 1) {
-            cp = KOMARcaptivePortalPage;
-        } else if (portalIndex == 2) {
-            cp = MYKOMARcaptivePortalPage;
-        } else {
-            cp = captivePortalPage;
-        }
-
-        webServer.on("/",handleRoot);
-        webServer.on("/generate_204", handleRoot);  // Android
-        webServer.on("/hotspot-detect.html", handleRoot); // Apple
-        webServer.on("/redirect", handleRoot);
-        webServer.onNotFound(handleRoot);
-        webServer.begin();
-        Serial.println("FakeAPEnabled set to true in fake_ap.cpp");
-
-        fakeAPEnabled = true; // Set flag to enabled
-        Serial.println("Starting Fake AP from fake_ap.cpp...");
-    }
+  fakeAPEnabled = true;
+  Serial.print(F("Fake AP started: "));
+  Serial.println(apSSID);
 }
 
 void loopAP() {
-    
-    // Handle clients
-    dnsServer.processNextRequest();
-    webServer.handleClient();
-    delay(10); // Small delay to prevent watchdog reset
+  dnsServer.processNextRequest();
+  webServer.handleClient();
 }
 
-
-
-// Stop Fake Access Point
 void stopFakeAP() {
-    if (!fakeAPEnabled) {
-        Serial.println("Fake AP already disabled, ignoring stop request from fake_ap.cpp.");
-        return; // Do not stop if already disabled
-    }
-    displayKawaskiBitmap();
-    Serial.println("Stopping Fake AP from fake_ap.cpp...");
-    webServer.stop();
-    dnsServer.stop();
-    WiFi.softAPdisconnect(true); // Disconnect soft AP, and reset DHCP server
-    WiFi.mode(WIFI_STA); // Return to station mode (or WIFI_OFF, depending on desired default)
-    fakeAPEnabled = false; // Set flag to disabled
-    Serial.println("Fake AP stopped in fake_ap.cpp.");
-    Serial.println("FakeAPEnabled set to false in fake_ap.cpp");
+  if (!fakeAPEnabled) {
+    return;
+  }
+
+  displayKawaskiBitmap();
+  webServer.stop();
+  dnsServer.stop();
+  WiFi.softAPdisconnect(true);
+  WiFi.mode(WIFI_OFF);
+  fakeAPEnabled = false;
+  Serial.println(F("Fake AP stopped"));
 }

@@ -3,11 +3,12 @@
 
 #include <Arduino.h>
 
-// String captivePortalPage = "<html><body><h1>Welcome to the Fake AP!</h1><p>You are now connected to the Fake AP.</p></body></html>";
-// make a string that will be used as the captive portal page
-extern int portalIndex = 0;
-extern String IQcaptivePortalPage = "<!DOCTYPE html>\n<html>\n<head>\n    <title>My Captive Portal</title>\n</head>\n<body>\n    <h1>Welcome to My IQ Portal!</h1>\n    <img src=\"data:image/png;base64,iVBORw0K...very_short_base64...g==\" alt=\"My Logo\">\n    <p>Connect to access the internet.</p>\n</body>\n</html>\n";
-extern String KOMARcaptivePortalPage= "<!DOCTYPE html>\n<html>\n<head>\n    <title>My Captive Portal</title>\n</head>\n<body>\n    <h1>Welcome to My Komar Portal!</h1>\n    <img src=\"data:image/png;base64,iVBORw0K...very_short_base64...g==\" alt=\"My Logo\">\n    <p>Connect to access the internet.</p>\n</body>\n</html>\n";
-extern String MYKOMARcaptivePortalPage= "<!DOCTYPE html>\n<html>\n<head>\n    <title>My Captive Portal</title>\n</head>\n<body>\n    <h1>Welcome to Komar wifi Portal!</h1>\n    <img src=\"data:image/png;base64,iVBORw0K...very_short_base64...g==\" alt=\"My Logo\">\n    <p>Connect to access the internet.</p>\n</body>\n</html>\n";
+extern int portalIndex;
+extern const char *IQcaptivePortalPage;
+extern const char *KOMARcaptivePortalPage;
+extern const char *MYKOMARcaptivePortalPage;
+extern const char *KOMARcapPortalPage;
 
-#endif // PORTALS_H
+const char *portalPageForIndex(int index);
+
+#endif

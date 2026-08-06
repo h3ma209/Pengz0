@@ -1,0 +1,15 @@
+{
+  "clangd.enable": false,
+  "C_Cpp.intelliSenseEngine": "default",
+  "platformio-ide.activateProjectOnStartup": true,
+  "platformio-ide.autoCloseSerialMonitor": true,
+  "platformio-ide.useBuiltinPIOCore": true,
+  "platformio-ide.useBuiltinPython": true,
+  "platformio-ide.customPATH": "C:\\Users\\hema\\.platformio\\penv\\Scripts",
+  "platformio-ide.disablePIOHomeStartup": true,
+  "platformio-ide.pioHomeServerHttpHost": "127.0.0.1",
+  "platformio-ide.pioHomeServerHttpPort": 8008,
+  "files.associations": {
+    "*.ino": "cpp"
+  }
+}
